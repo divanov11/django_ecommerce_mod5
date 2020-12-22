@@ -45,6 +45,9 @@ class Order(models.Model):
 		for i in orderitems:
 			if i.product.digital == False:
 				shipping = True
+			elif i.product.digital == True:
+                		shipping = False
+                		break
 		return shipping
 
 	@property
