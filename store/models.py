@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
+# Users that will be registered  
 class Customer(models.Model):
 	user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
 	name = models.CharField(max_length=200, null=True)
@@ -11,6 +12,7 @@ class Customer(models.Model):
 	def __str__(self):
 		return self.name
 
+# Products available on the website
 
 class Product(models.Model):
 	name = models.CharField(max_length=200)
@@ -28,6 +30,8 @@ class Product(models.Model):
 		except:
 			url = ''
 		return url
+
+#  all the Products ordered By a specific user
 
 class Order(models.Model):
 	customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
@@ -59,6 +63,8 @@ class Order(models.Model):
 		total = sum([item.quantity for item in orderitems])
 		return total 
 
+# retrieved a certain item in the cart
+
 class OrderItem(models.Model):
 	product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
 	order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
@@ -69,6 +75,8 @@ class OrderItem(models.Model):
 	def get_total(self):
 		total = self.product.price * self.quantity
 		return total
+
+# User's address 
 
 class ShippingAddress(models.Model):
 	customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
