@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 import json
 import datetime
@@ -9,68 +9,84 @@ from .utils import cookieCart, cartData, guestOrder
 def store(request):
 	data = cartData(request)
 	cartItems = data['cartItems']
-	order = data['order']
-	items = data['items']
-
-	# Get department and subcategory
-	department = request.GET.get('department')
-	subcategory = request.GET.get('subcategory')
-
-	# Start with all available products
+	
+	# Start with all products
 	products = Product.objects.filter(is_available=True)
-	categories = Category.objects.all()
 	
-	# Filter by category
-	category = request.GET.get('category')
-	if category:
-		products = products.filter(category__slug=category)
-	
-	# Filter by price range
+	# Get all filter parameters
+	filters = {}
+	category_slug = request.GET.get('category')
+	brand = request.GET.get('brand')
 	min_price = request.GET.get('min_price')
 	max_price = request.GET.get('max_price')
-
-	if min_price or max_price:
-		if min_price:
-			try:
-				min_price = float(min_price)
-				products = products.filter(price__gte=min_price)
-			except ValueError:
-				pass
-		
-		if max_price:
-			try:
-				max_price = float(max_price)
-				products = products.filter(price__lte=max_price)
-			except ValueError:
-				pass
+	sort_by = request.GET.get('sort')
 	
-	# Filter by brand
-	brand = request.GET.get('brand')
+	# Apply category filter
+	if category_slug:
+		filters['category'] = category_slug
+		try:
+			category = Category.objects.get(slug=category_slug)
+			if category.is_department:
+				subcategories = Category.objects.filter(parent=category)
+				products = products.filter(category__in=subcategories)
+			else:
+				products = products.filter(category=category)
+		except Category.DoesNotExist:
+			pass
+	
+	# Apply brand filter
 	if brand:
+		filters['brand'] = brand
 		products = products.filter(brand=brand)
 	
-	# Search functionality
-	search_query = request.GET.get('q')
-	if search_query:
-		products = products.filter(
-			Q(name__icontains=search_query) |
-			Q(description__icontains=search_query)
-		)
+	# Apply price filters
+	if min_price:
+		try:
+			filters['min_price'] = min_price
+			products = products.filter(price__gte=float(min_price))
+		except ValueError:
+			pass
 	
-	# Sorting
-	sort_by = request.GET.get('sort')
-	if sort_by == 'price_asc':
-		products = products.order_by('price')
-	elif sort_by == 'price_desc':
-		products = products.order_by('-price')
-	elif sort_by == 'newest':
-		products = products.order_by('-created_date')
+	if max_price:
+		try:
+			filters['max_price'] = max_price
+			products = products.filter(price__lte=float(max_price))
+		except ValueError:
+			pass
+	
+	# Apply sorting
+	if sort_by:
+		filters['sort'] = sort_by
+		if sort_by == 'price_asc':
+			products = products.order_by('price')
+		elif sort_by == 'price_desc':
+			products = products.order_by('-price')
+	
+	# Get all categories for the sidebar
+	main_categories = Category.objects.filter(is_department=True)
+	subcategories = Category.objects.filter(is_department=False)
+	
+	# Get all unique brands
+	brands = Product.objects.values_list('brand', flat=True).distinct().order_by('brand')
+	
+	# Debug print categories
+	print("\nMain Categories:")
+	for cat in main_categories:
+		print(f"- {cat.name} (slug: {cat.slug})")
+	
+	print("\nSubcategories:")
+	for cat in subcategories:
+		print(f"- {cat.name} (slug: {cat.slug}, parent: {cat.parent})")
 	
 	context = {
 		'products': products,
-		'categories': categories,
-		'current_category': category,
-		'brands': Product.objects.values_list('brand', flat=True).distinct()
+		'cartItems': cartItems,
+		'main_categories': main_categories,
+		'subcategories': subcategories,
+		'brands': brands,
+		'active_filters': filters,
+		'current_category': category_slug,
+		'current_brand': brand,
 	}
 	return render(request, 'store/store.html', context)
 
@@ -147,3 +163,21 @@ def processOrder(request):
 		)
 
 	return JsonResponse('Payment submitted..', safe=False)
+
+def product_detail(request, product_id):
+	data = cartData(request)
+	cartItems = data['cartItems']
+	
+	product = get_object_or_404(Product, id=product_id)
+	
+	# Get related products from the same category
+	related_products = Product.objects.filter(
+		category=product.category
+	).exclude(id=product.id)[:4]
+	
+	context = {
+		'product': product,
+		'cartItems': cartItems,
+		'related_products': related_products,
+	}
+	return render(request, 'store/product_detail.html', context)

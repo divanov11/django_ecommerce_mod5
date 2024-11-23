@@ -258,3 +258,188 @@ h1,h2,h3,h4,h5,h6{
 #form-button:hover {
     background-color: #3d6a6f;
 }
+
+.badge {
+    padding: 8px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.badge a {
+    color: white;
+    text-decoration: none;
+}
+
+.badge a:hover {
+    color: #f8f9fa;
+}
+
+.filter-section {
+    margin-bottom: 20px;
+}
+
+.active-filter {
+    font-weight: bold;
+    color: #007bff;
+}
+
+/* Product Detail Page */
+.product-detail-img {
+    max-height: 400px;
+    object-fit: contain;
+}
+
+.badge {
+    font-size: 1em;
+    padding: 0.5em 1em;
+}
+
+.related-product-card {
+    transition: transform 0.2s;
+}
+
+.related-product-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Product card hover effect */
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Product title link */
+.card-title a {
+    color: #4f868c;
+    text-decoration: none;
+}
+
+.card-title a:hover {
+    color: #2c4c4f;
+}
+
+/* Brand Filter Styles */
+.brand-filter {
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.brand-link {
+    color: #4f868c;
+    text-decoration: none;
+    display: block;
+    padding: 5px 0;
+    transition: all 0.2s;
+}
+
+.brand-link:hover {
+    color: #2c4c4f;
+    text-decoration: none;
+    padding-left: 5px;
+}
+
+.brand-link.active {
+    font-weight: bold;
+    color: #2c4c4f;
+    padding-left: 5px;
+}
+
+/* Scrollbar styles for brand filter */
+.brand-filter::-webkit-scrollbar {
+    width: 6px;
+}
+
+.brand-filter::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.brand-filter::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.brand-filter::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Active Filters */
+.active-filters {
+    margin: 15px 0;
+}
+
+.filter-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 0 5px 5px 0;
+    background-color: #4f868c;
+    color: white;
+    border-radius: 15px;
+    font-size: 0.9em;
+}
+
+.filter-badge .remove-filter {
+    margin-left: 5px;
+    color: white;
+    text-decoration: none;
+}
+
+.filter-badge .remove-filter:hover {
+    color: #f1f1f1;
+}
+
+/* Price Filter */
+.price-filter-form {
+    margin-bottom: 1rem;
+}
+
+.price-filter-form input {
+    margin-bottom: 0.5rem;
+}
+
+/* Sort Dropdown */
+.sort-dropdown {
+    min-width: 200px;
+}
+
+/* Active Filters */
+.active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.filter-badge {
+    background-color: #4f868c;
+    color: white;
+    padding: 0.3rem 0.7rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+}
+
+.filter-badge .remove-filter {
+    color: white;
+    margin-left: 0.5rem;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.filter-badge .remove-filter:hover {
+    color: #ff0000;
+}
+
+/* Form Controls */
+.form-control-sm {
+    height: calc(1.5em + 0.5rem + 2px);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+}

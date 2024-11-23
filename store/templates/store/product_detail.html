@@ -1,0 +1,62 @@
+{% extends 'store/main.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Product Image -->
+        <div class="col-md-6">
+            <img class="img-fluid" src="{{ product.imageURL }}" alt="{{ product.name }}">
+        </div>
+        
+        <!-- Product Details -->
+        <div class="col-md-6">
+            <h2>{{ product.name }}</h2>
+            <p class="text-muted">
+                Brand: <a href="{% url 'store' %}?brand={{ product.brand }}" class="brand-link">{{ product.brand }}</a>
+            </p>
+            <h4 class="mt-3">${{ product.price|floatformat:2 }}</h4>
+            
+            {% if product.stock > 0 %}
+                <span class="badge badge-success">In Stock</span>
+            {% else %}
+                <span class="badge badge-danger">Out of Stock</span>
+            {% endif %}
+            
+            <div class="mt-4">
+                <button data-product="{{ product.id }}" data-action="add" 
+                        class="btn btn-primary update-cart">
+                    Add to Cart
+                </button>
+            </div>
+            
+            <div class="mt-4">
+                <h5>Description</h5>
+                <p>{{ product.description }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Related Products -->
+    {% if related_products %}
+    <div class="mt-5">
+        <h3>Related Products</h3>
+        <div class="row">
+            {% for related in related_products %}
+            <div class="col-md-3">
+                <div class="card">
+                    <a href="{% url 'product_detail' related.id %}">
+                        <img src="{{ related.imageURL }}" class="card-img-top" alt="{{ related.name }}">
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ related.name }}</h5>
+                        <p class="card-text">${{ related.price|floatformat:2 }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock content %} 

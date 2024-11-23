@@ -7,84 +7,157 @@
         <!-- Filter Sidebar -->
         <div class="col-lg-3">
             <div class="card">
-                <div class="card-header">
-                    <h5>Filters</h5>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Filters</h5>
+                    {% if active_filters %}
+                        <a href="{% url 'store' %}" class="btn btn-sm btn-outline-secondary">Clear All</a>
+                    {% endif %}
                 </div>
                 <div class="card-body">
-                    <!-- Categories -->
-                    <h6>Categories</h6>
-                    <ul class="list-unstyled">
-                        {% for category in categories %}
-                        <li>
-                            <a href="?category={{ category.slug }}" 
-                               class="{% if category.slug == current_category %}font-weight-bold{% endif %}">
-                                {{ category.name }}
-                            </a>
-                        </li>
-                        {% endfor %}
-                    </ul>
-
-                    <!-- Price Range -->
+                    <!-- Price Filter -->
                     <h6>Price Range</h6>
-                    <form method="get" class="price-filter">
+                    <form class="price-filter-form" method="get">
+                        <!-- Preserve existing filters -->
+                        {% if active_filters.category %}
+                            <input type="hidden" name="category" value="{{ active_filters.category }}">
+                        {% endif %}
+                        {% if active_filters.brand %}
+                            <input type="hidden" name="brand" value="{{ active_filters.brand }}">
+                        {% endif %}
+                        {% if active_filters.sort %}
+                            <input type="hidden" name="sort" value="{{ active_filters.sort }}">
+                        {% endif %}
+                        
                         <div class="form-group">
                             <input type="number" 
+                                   class="form-control form-control-sm" 
                                    name="min_price" 
-                                   class="form-control form-control-sm" 
                                    placeholder="Min Price"
-                                   value="{{ request.GET.min_price }}"
-                                   min="0"
-                                   step="0.01">
+                                   value="{{ active_filters.min_price }}"
+                                   min="{{ price_range.min_price|floatformat:0 }}"
+                                   max="{{ price_range.max_price|floatformat:0 }}">
                         </div>
                         <div class="form-group">
                             <input type="number" 
-                                   name="max_price" 
                                    class="form-control form-control-sm" 
+                                   name="max_price" 
                                    placeholder="Max Price"
-                                   value="{{ request.GET.max_price }}"
-                                   min="0"
-                                   step="0.01">
+                                   value="{{ active_filters.max_price }}"
+                                   min="{{ price_range.min_price|floatformat:0 }}"
+                                   max="{{ price_range.max_price|floatformat:0 }}">
                         </div>
-                        <button type="submit" class="btn btn-sm btn-primary w-100">Apply Filter</button>
+                        <button type="submit" class="btn btn-sm btn-primary">Apply Price</button>
                     </form>
+
+                    <!-- Categories -->
+                    <h6 class="mt-4">Categories</h6>
+                    {% for main_cat in main_categories %}
+                        <div class="mb-2">
+                            <a href="?category={{ main_cat.slug }}" 
+                               class="{% if main_cat.slug == current_category %}font-weight-bold{% endif %}">
+                                {{ main_cat.name }}
+                            </a>
+                            <ul class="list-unstyled ml-3">
+                                {% for subcat in subcategories %}
+                                    {% if subcat.parent == main_cat %}
+                                        <li>
+                                            <a href="?category={{ subcat.slug }}" 
+                                               class="{% if subcat.slug == current_category %}font-weight-bold{% endif %}">
+                                                {{ subcat.name }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endfor %}
 
                     <!-- Brands -->
                     <h6 class="mt-4">Brands</h6>
-                    <ul class="list-unstyled">
-                        {% for brand in brands %}
-                        <li>
-                            <a href="?brand={{ brand }}">{{ brand }}</a>
-                        </li>
+                    <div class="brand-filter">
+                        {% for brand_name in brands %}
+                            <div class="form-check">
+                                <a href="?{% if active_filters.category %}category={{ active_filters.category }}&{% endif %}brand={{ brand_name }}"
+                                   class="brand-link {% if brand_name == current_brand %}active{% endif %}">
+                                    {{ brand_name }}
+                                </a>
+                            </div>
                         {% endfor %}
-                    </ul>
-
-                    <!-- Sort Options -->
-                    <h6 class="mt-4">Sort By</h6>
-                    <select class="form-control form-control-sm" onchange="location = this.value;">
-                        <option value="?sort=newest">Newest First</option>
-                        <option value="?sort=price_asc">Price: Low to High</option>
-                        <option value="?sort=price_desc">Price: High to Low</option>
-                    </select>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Products Grid -->
+        <!-- Product Grid -->
         <div class="col-lg-9">
+            <!-- Sorting and Active Filters -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <!-- Sort Dropdown -->
+                <div class="sort-dropdown">
+                    <select class="form-control form-control-sm" id="sort-select">
+                        <option value="">Sort By</option>
+                        {% for option in sort_options %}
+                            <option value="{{ option.value }}" 
+                                    {% if active_filters.sort == option.value %}selected{% endif %}>
+                                {{ option.label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Products count -->
+                <div class="text-muted">
+                    Showing {{ products|length }} products
+                </div>
+            </div>
+
+            <!-- Active Filters -->
+            {% if active_filters %}
+            <div class="active-filters mb-3">
+                {% if active_filters.category %}
+                <span class="filter-badge">
+                    Category: {{ active_filters.category }}
+                    <a href="?{% for key, value in active_filters.items %}{% if key != 'category' %}{{ key }}={{ value }}&{% endif %}{% endfor %}" 
+                       class="remove-filter">&times;</a>
+                </span>
+                {% endif %}
+                
+                {% if active_filters.brand %}
+                <span class="filter-badge">
+                    Brand: {{ active_filters.brand }}
+                    <a href="?{% for key, value in active_filters.items %}{% if key != 'brand' %}{{ key }}={{ value }}&{% endif %}{% endfor %}" 
+                       class="remove-filter">&times;</a>
+                </span>
+                {% endif %}
+                
+                {% if active_filters.min_price or active_filters.max_price %}
+                <span class="filter-badge">
+                    Price: ${{ active_filters.min_price|default:0 }} - ${{ active_filters.max_price|default:'∞' }}
+                    <a href="?{% for key, value in active_filters.items %}{% if key != 'min_price' and key != 'max_price' %}{{ key }}={{ value }}&{% endif %}{% endfor %}" 
+                       class="remove-filter">&times;</a>
+                </span>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Products -->
             <div class="row">
                 {% for product in products %}
                 <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100 product-card">
-                        <img class="card-img-top" src="{{ product.imageURL }}" alt="{{ product.name }}">
+                    <div class="card h-100">
+                        <a href="{% url 'product_detail' product.id %}">
+                            <img class="card-img-top" src="{{product.imageURL}}" alt="">
+                        </a>
                         <div class="card-body">
-                            <h4 class="card-title">{{ product.name }}</h4>
-                            <div class="price mb-3">${{ product.price|floatformat:2 }}</div>
-                            <p class="card-text">{{ product.description|truncatewords:20 }}</p>
+                            <h4 class="card-title">
+                                <a href="{% url 'product_detail' product.id %}">{{product.name}}</a>
+                            </h4>
+                            <h5>${{product.price|floatformat:2}}</h5>
+                            <p class="card-text">{{product.description|truncatewords:20}}</p>
                         </div>
-                        <div class="card-footer bg-transparent border-top-0">
-                            <button data-product="{{ product.id }}" 
-                                    data-action="add" 
-                                    class="btn add-to-cart update-cart">
+                        <div class="card-footer">
+                            <button data-product="{{product.id}}" data-action="add" 
+                                    class="btn btn-outline-secondary add-btn update-cart">
                                 Add to Cart
                             </button>
                         </div>
@@ -92,6 +165,12 @@
                 </div>
                 {% endfor %}
             </div>
+
+            {% if not products %}
+            <div class="text-center mt-4">
+                <h5>No products found matching your criteria.</h5>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

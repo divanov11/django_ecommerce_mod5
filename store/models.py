@@ -16,6 +16,14 @@ class Customer(models.Model):
 class Category(models.Model):
 	name = models.CharField(max_length=200)
 	slug = models.SlugField(max_length=200, unique=True, blank=True)
+	parent = models.ForeignKey(
+		'self',
+		null=True,
+		blank=True,
+		on_delete=models.CASCADE,
+		related_name='children'
+	)
+	is_department = models.BooleanField(default=False)
 	
 	class Meta:
 		ordering = ('name',)
