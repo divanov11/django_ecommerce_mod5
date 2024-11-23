@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.text import slugify
 
 # Create your models here.
 
@@ -12,11 +13,72 @@ class Customer(models.Model):
 		return self.name
 
 
-class Product(models.Model):
+class Category(models.Model):
 	name = models.CharField(max_length=200)
+	slug = models.SlugField(max_length=200, unique=True, blank=True)
+	
+	class Meta:
+		ordering = ('name',)
+		verbose_name_plural = 'categories'
+		
+	def save(self, *args, **kwargs):
+		if not self.slug:
+			self.slug = slugify(self.name)
+		super().save(*args, **kwargs)
+		
+	def __str__(self):
+		return self.name
+
+def get_default_category():
+	return Category.objects.get_or_create(
+		name='Uncategorized',
+		slug='uncategorized'
+	)[0].id
+
+class Product(models.Model):
+	name = models.CharField(max_length=200, null=True)
 	price = models.FloatField()
-	digital = models.BooleanField(default=False,null=True, blank=True)
+	digital = models.BooleanField(default=False, null=True, blank=True)
 	image = models.ImageField(null=True, blank=True)
+	category = models.ForeignKey(
+		Category, 
+		on_delete=models.SET_NULL, 
+		null=True,
+		blank=True
+	)
+	brand = models.CharField(
+		max_length=200,
+		null=True,
+		blank=True,
+		default="Unbranded"
+	)
+	description = models.TextField(
+		null=True,
+		blank=True,
+		default="No description available"
+	)
+	is_available = models.BooleanField(
+		default=True
+	)
+	created_date = models.DateTimeField(
+		auto_now_add=True,
+		null=True
+	)
+	modified_date = models.DateTimeField(
+		auto_now=True,
+		null=True
+	)
+	stock = models.IntegerField(
+		default=0,
+		null=True,
+		blank=True
+	)
+	sku = models.CharField(
+		max_length=100,
+		null=True,
+		blank=True,
+		unique=True
+	)
 
 	def __str__(self):
 		return self.name
