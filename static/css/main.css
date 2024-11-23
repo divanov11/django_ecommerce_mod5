@@ -210,3 +210,51 @@ h1,h2,h3,h4,h5,h6{
 .product-card .add-to-cart:hover {
     background-color: #3d6a6f;
 }
+
+.form-field {
+    margin-bottom: 1rem;
+}
+
+.form-field input {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100%;
+    transition: border-color 0.2s ease;
+}
+
+.form-field input:focus {
+    border-color: #4f868c;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(79,134,140,0.2);
+}
+
+.form-field input:invalid {
+    border-color: #dc3545;
+}
+
+.form-field input:invalid:focus {
+    box-shadow: 0 0 0 2px rgba(220,53,69,0.2);
+}
+
+#form h4 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+}
+
+#form hr {
+    margin: 2rem 0;
+    border-color: #eee;
+}
+
+#form-button {
+    padding: 1rem;
+    font-size: 1.1rem;
+    background-color: #4f868c;
+    border: none;
+}
+
+#form-button:hover {
+    background-color: #3d6a6f;
+}

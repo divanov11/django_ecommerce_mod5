@@ -4,39 +4,112 @@
      <div class="row">
 		<div class="col-lg-6">
 			<div class="box-element" id="form-wrapper">
-				<form id="form">
+				<form id="form" autocomplete="on">
 					<div id="user-info">
+						<h4>Contact Information</h4>
 						<div class="form-field">
-							<input required class="form-control" type="text" name="name" placeholder="Name..">
+							<input required 
+								   class="form-control" 
+								   type="text" 
+								   name="name" 
+								   autocomplete="name"
+								   placeholder="Full Name"
+								   pattern="[A-Za-z\s]+"
+								   title="Please enter a valid name (letters and spaces only)">
 						</div>
 						<div class="form-field">
-							<input required class="form-control" type="email" name="email" placeholder="Email..">
+							<input required 
+								   class="form-control" 
+								   type="email" 
+								   name="email" 
+								   autocomplete="email"
+								   placeholder="Email Address"
+								   pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+								   title="Please enter a valid email address">
+						</div>
+						<div class="form-field">
+							<input class="form-control" 
+								   type="tel" 
+								   name="phone" 
+								   autocomplete="tel"
+								   placeholder="Phone Number (optional)"
+								   pattern="[0-9\-\+\s\(\)]*"
+								   title="Please enter a valid phone number">
 						</div>
 					</div>
 					
 					<div id="shipping-info">
 						<hr>
-						<p>Shipping Information:</p>
+						<h4>Shipping Information</h4>
 						<hr>
 						<div class="form-field">
-							<input class="form-control" type="text" name="address" placeholder="Address..">
+							<input class="form-control" 
+								   type="text" 
+								   name="address" 
+								   autocomplete="street-address"
+								   placeholder="Street Address"
+								   required>
 						</div>
 						<div class="form-field">
-							<input class="form-control" type="text" name="city" placeholder="City..">
+							<input class="form-control" 
+								   type="text" 
+								   name="apartment" 
+								   autocomplete="address-line2"
+								   placeholder="Apartment, suite, etc. (optional)">
 						</div>
-						<div class="form-field">
-							<input class="form-control" type="text" name="state" placeholder="State..">
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-field">
+									<input class="form-control" 
+										   type="text" 
+										   name="city" 
+										   autocomplete="address-level2"
+										   placeholder="City"
+										   required>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-field">
+									<input class="form-control" 
+										   type="text" 
+										   name="state" 
+										   autocomplete="address-level1"
+										   placeholder="State/Province"
+										   required>
+								</div>
+							</div>
 						</div>
-						<div class="form-field">
-							<input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
-						</div>
-						<div class="form-field">
-							<input class="form-control" type="text" name="country" placeholder="Zip code..">
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-field">
+									<input class="form-control" 
+										   type="text" 
+										   name="zipcode" 
+										   autocomplete="postal-code"
+										   placeholder="ZIP/Postal Code"
+										   pattern="[0-9\-]*"
+										   title="Please enter a valid postal code"
+										   required>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-field">
+									<input class="form-control" 
+										   type="text" 
+										   name="country" 
+										   autocomplete="country"
+										   placeholder="Country"
+										   required>
+								</div>
+							</div>
 						</div>
 					</div>
 
 					<hr>
-					<input id="form-button" class="btn btn-success btn-block" type="submit" value="Continue">
+					<input id="form-button" 
+						   class="btn btn-success btn-block" 
+						   type="submit" 
+						   value="Continue to Payment">
 				</form>
 			</div>
 
