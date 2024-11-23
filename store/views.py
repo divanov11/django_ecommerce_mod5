@@ -8,11 +8,15 @@ from .utils import cookieCart, cartData, guestOrder
 
 def store(request):
 	data = cartData(request)
-
 	cartItems = data['cartItems']
 	order = data['order']
 	items = data['items']
 
+	# Get department and subcategory
+	department = request.GET.get('department')
+	subcategory = request.GET.get('subcategory')
+
+	# Start with all available products
 	products = Product.objects.filter(is_available=True)
 	categories = Category.objects.all()
 	
@@ -24,8 +28,21 @@ def store(request):
 	# Filter by price range
 	min_price = request.GET.get('min_price')
 	max_price = request.GET.get('max_price')
-	if min_price and max_price:
-		products = products.filter(price__gte=min_price, price__lte=max_price)
+
+	if min_price or max_price:
+		if min_price:
+			try:
+				min_price = float(min_price)
+				products = products.filter(price__gte=min_price)
+			except ValueError:
+				pass
+		
+		if max_price:
+			try:
+				max_price = float(max_price)
+				products = products.filter(price__lte=max_price)
+			except ValueError:
+				pass
 	
 	# Filter by brand
 	brand = request.GET.get('brand')
