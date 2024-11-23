@@ -1,22 +1,98 @@
 {% extends 'store/main.html' %}
 {% load static %}
+
 {% block content %}
-	<div class="row">
-		{% for product in products %}
-		<div class="col-lg-4">
-			<img class="thumbnail" src="{{product.imageURL}}">
-			<div class="box-element product">
-				<h6><strong>{{product.name}}</strong></h6>
-				<hr>
+<div class="container">
+    <div class="row">
+        <!-- Filter Sidebar -->
+        <div class="col-lg-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Filters</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Categories -->
+                    <h6>Categories</h6>
+                    <ul class="list-unstyled">
+                        {% for category in categories %}
+                        <li>
+                            <a href="?category={{ category.slug }}" 
+                               class="{% if category.slug == current_category %}font-weight-bold{% endif %}">
+                                {{ category.name }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
 
-				<button data-product="{{product.id}}" data-action="add" class="btn btn-outline-secondary add-btn update-cart">Add to Cart</button>
-				
-				<a class="btn btn-outline-success" href="#">View</a>
-				<h4 style="display: inline-block; float: right"><strong>${{product.price}}</strong></h4>
+                    <!-- Price Range -->
+                    <h6>Price Range</h6>
+                    <form method="get" class="price-filter">
+                        <div class="form-group">
+                            <input type="number" 
+                                   name="min_price" 
+                                   class="form-control form-control-sm" 
+                                   placeholder="Min Price"
+                                   value="{{ request.GET.min_price }}"
+                                   min="0"
+                                   step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <input type="number" 
+                                   name="max_price" 
+                                   class="form-control form-control-sm" 
+                                   placeholder="Max Price"
+                                   value="{{ request.GET.max_price }}"
+                                   min="0"
+                                   step="0.01">
+                        </div>
+                        <button type="submit" class="btn btn-sm btn-primary w-100">Apply Filter</button>
+                    </form>
 
-			</div>
-		</div>
-		{% endfor %}
-	</div>
+                    <!-- Brands -->
+                    <h6 class="mt-4">Brands</h6>
+                    <ul class="list-unstyled">
+                        {% for brand in brands %}
+                        <li>
+                            <a href="?brand={{ brand }}">{{ brand }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
 
+                    <!-- Sort Options -->
+                    <h6 class="mt-4">Sort By</h6>
+                    <select class="form-control form-control-sm" onchange="location = this.value;">
+                        <option value="?sort=newest">Newest First</option>
+                        <option value="?sort=price_asc">Price: Low to High</option>
+                        <option value="?sort=price_desc">Price: High to Low</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="col-lg-9">
+            <div class="row">
+                {% for product in products %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 product-card">
+                        <img class="card-img-top" src="{{ product.imageURL }}" alt="{{ product.name }}">
+                        <div class="card-body">
+                            <h4 class="card-title">{{ product.name }}</h4>
+                            <div class="price mb-3">${{ product.price|floatformat:2 }}</div>
+                            <p class="card-text">{{ product.description|truncatewords:20 }}</p>
+                        </div>
+                        <div class="card-footer bg-transparent border-top-0">
+                            <button data-product="{{ product.id }}" 
+                                    data-action="add" 
+                                    class="btn add-to-cart update-cart">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}

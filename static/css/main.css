@@ -97,3 +97,116 @@ h1,h2,h3,h4,h5,h6{
 .hidden{
 	display: none!important;
 }
+
+.filter-section {
+    margin-bottom: 20px;
+}
+
+.filter-section h6 {
+    color: #333;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.filter-section ul li {
+    margin-bottom: 5px;
+}
+
+.filter-section ul li a {
+    color: #666;
+    text-decoration: none;
+}
+
+.filter-section ul li a:hover {
+    color: #4f868c;
+}
+
+.price-filter input {
+    margin-bottom: 10px;
+}
+
+.sort-select {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.price-filter {
+    background: #fff;
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.price-filter input {
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    width: 100%;
+}
+
+.price-filter button {
+    background-color: #4f868c;
+    border: none;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.price-filter button:hover {
+    background-color: #3d6a6f;
+}
+
+.product-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-bottom: 20px;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.product-card .card-img-top {
+    height: 200px;
+    object-fit: cover;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.product-card .card-body {
+    padding: 1.25rem;
+}
+
+.product-card .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.product-card .card-text {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.product-card .price {
+    font-size: 1.2rem;
+    color: #4f868c;
+    font-weight: 600;
+}
+
+.product-card .add-to-cart {
+    background-color: #4f868c;
+    color: white;
+    border: none;
+    width: 100%;
+    padding: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.product-card .add-to-cart:hover {
+    background-color: #3d6a6f;
+}
