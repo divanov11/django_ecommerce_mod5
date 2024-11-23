@@ -1,10 +1,17 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 import json
 import datetime
 from django.db.models import Q
 from .models import * 
 from .utils import cookieCart, cartData, guestOrder
+from django.contrib.auth import login, authenticate
+from .forms import CustomUserCreationForm, CustomerForm
+import stripe
+from django.conf import settings
+
+# Add these settings at the top of the file
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 def store(request):
 	data = cartData(request)
@@ -108,8 +115,18 @@ def checkout(request):
 	order = data['order']
 	items = data['items']
 
-	context = {'items':items, 'order':order, 'cartItems':cartItems}
+	# If user is not authenticated, redirect to login/register choice page
+	if not request.user.is_authenticated:
+		return redirect('login_register_choice')
+
+	context = {
+		'items': items,
+		'order': order,
+		'cartItems': cartItems,
+		'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
+	}
 	return render(request, 'store/checkout.html', context)
+
 def updateItem(request):
 	data = json.loads(request.body)
 	productId = data['productId']
@@ -181,3 +198,82 @@ def product_detail(request, product_id):
 		'related_products': related_products,
 	}
 	return render(request, 'store/product_detail.html', context)
+
+def register_user(request):
+	if request.method == 'POST':
+		form = CustomUserCreationForm(request.POST)
+		if form.is_valid():
+			user = form.save()
+			# Create customer profile
+			Customer.objects.create(
+				user=user,
+				name=user.username,
+				email=user.email
+			)
+			login(request, user)
+			return redirect('checkout')
+	else:
+		form = CustomUserCreationForm()
+	return render(request, 'store/register.html', {'form': form})
+
+def login_view(request):
+	if request.method == 'POST':
+		username = request.POST.get('username')
+		password = request.POST.get('password')
+		user = authenticate(request, username=username, password=password)
+		if user is not None:
+			login(request, user)
+			return redirect('checkout')
+	return render(request, 'store/login.html')
+
+def create_payment_intent(request):
+	data = cartData(request)
+	order = data['order']
+	
+	intent = stripe.PaymentIntent.create(
+		amount=int(order.get_cart_total * 100),  # Convert to cents
+		currency='usd',
+		metadata={'order_id': order.id}
+	)
+	
+	return JsonResponse({
+		'clientSecret': intent.client_secret
+	})
+
+def process_order(request):
+	transaction_id = datetime.datetime.now().timestamp()
+	data = json.loads(request.body)
+
+	if request.user.is_authenticated:
+		customer = request.user.customer
+		order, created = Order.objects.get_or_create(customer=customer, complete=False)
+	else:
+		# Handle guest user case
+		customer, order = guestOrder(request, data)
+
+	total = float(data['form']['total'])
+	order.transaction_id = transaction_id
+
+	if total == order.get_cart_total:
+		order.complete = True
+	order.save()
+
+	if order.shipping:
+		ShippingAddress.objects.create(
+			customer=customer,
+			order=order,
+			address=data['shipping']['address'],
+			city=data['shipping']['city'],
+			state=data['shipping']['state'],
+			zipcode=data['shipping']['zipcode'],
+		)
+
+	return JsonResponse('Payment complete!', safe=False)
+
+def login_register_choice(request):
+	"""View to let users choose between login, register, or guest checkout"""
+	# If user is already authenticated, redirect to checkout
+	if request.user.is_authenticated:
+		return redirect('checkout')
+		
+	return render(request, 'store/login_register_choice.html')

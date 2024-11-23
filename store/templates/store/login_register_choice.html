@@ -1,0 +1,17 @@
+{% extends 'store/main.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h2>Checkout Options</h2>
+            <div class="mt-4">
+                <a href="{% url 'login' %}" class="btn btn-primary btn-lg btn-block mb-3">Login</a>
+                <a href="{% url 'register' %}" class="btn btn-success btn-lg btn-block mb-3">Create Account</a>
+                <a href="{% url 'checkout' %}?guest=true" class="btn btn-secondary btn-lg btn-block">Continue as Guest</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %} 

@@ -1,267 +1,141 @@
 {% extends 'store/main.html' %}
 {% load static %}
+
 {% block content %}
-     <div class="row">
-		<div class="col-lg-6">
-			<div class="box-element" id="form-wrapper">
-				<form id="form" autocomplete="on">
-					<div id="user-info">
-						<h4>Contact Information</h4>
-						<div class="form-field">
-							<input required 
-								   class="form-control" 
-								   type="text" 
-								   name="name" 
-								   autocomplete="name"
-								   placeholder="Full Name"
-								   pattern="[A-Za-z\s]+"
-								   title="Please enter a valid name (letters and spaces only)">
-						</div>
-						<div class="form-field">
-							<input required 
-								   class="form-control" 
-								   type="email" 
-								   name="email" 
-								   autocomplete="email"
-								   placeholder="Email Address"
-								   pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-								   title="Please enter a valid email address">
-						</div>
-						<div class="form-field">
-							<input class="form-control" 
-								   type="tel" 
-								   name="phone" 
-								   autocomplete="tel"
-								   placeholder="Phone Number (optional)"
-								   pattern="[0-9\-\+\s\(\)]*"
-								   title="Please enter a valid phone number">
-						</div>
-					</div>
-					
-					<div id="shipping-info">
-						<hr>
-						<h4>Shipping Information</h4>
-						<hr>
-						<div class="form-field">
-							<input class="form-control" 
-								   type="text" 
-								   name="address" 
-								   autocomplete="street-address"
-								   placeholder="Street Address"
-								   required>
-						</div>
-						<div class="form-field">
-							<input class="form-control" 
-								   type="text" 
-								   name="apartment" 
-								   autocomplete="address-line2"
-								   placeholder="Apartment, suite, etc. (optional)">
-						</div>
-						<div class="row">
-							<div class="col-md-6">
-								<div class="form-field">
-									<input class="form-control" 
-										   type="text" 
-										   name="city" 
-										   autocomplete="address-level2"
-										   placeholder="City"
-										   required>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-field">
-									<input class="form-control" 
-										   type="text" 
-										   name="state" 
-										   autocomplete="address-level1"
-										   placeholder="State/Province"
-										   required>
-								</div>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-md-6">
-								<div class="form-field">
-									<input class="form-control" 
-										   type="text" 
-										   name="zipcode" 
-										   autocomplete="postal-code"
-										   placeholder="ZIP/Postal Code"
-										   pattern="[0-9\-]*"
-										   title="Please enter a valid postal code"
-										   required>
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-field">
-									<input class="form-control" 
-										   type="text" 
-										   name="country" 
-										   autocomplete="country"
-										   placeholder="Country"
-										   required>
-								</div>
-							</div>
-						</div>
-					</div>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="box-element" id="form-wrapper">
+                <form id="payment-form">
+                    <div id="shipping-info">
+                        <hr>
+                        <h3>Shipping Information:</h3>
+                        <hr>
+                        <div class="form-field">
+                            <input class="form-control" type="text" name="address" placeholder="Address..">
+                        </div>
+                        <div class="form-field">
+                            <input class="form-control" type="text" name="city" placeholder="City..">
+                        </div>
+                        <div class="form-field">
+                            <input class="form-control" type="text" name="state" placeholder="State..">
+                        </div>
+                        <div class="form-field">
+                            <input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
+                        </div>
+                    </div>
 
-					<hr>
-					<input id="form-button" 
-						   class="btn btn-success btn-block" 
-						   type="submit" 
-						   value="Continue to Payment">
-				</form>
-			</div>
+                    <hr>
+                    <h3>Payment:</h3>
+                    <hr>
+                    <div id="card-element">
+                        <!-- A Stripe Element will be inserted here. -->
+                    </div>
+                    <div id="card-errors" role="alert"></div>
 
-			<br>
-			<div class="box-element hidden" id="payment-info">
-				<small>Paypal Options</small>
-				<!--<button id="make-payment">Make payment</button>-->
-				<div id="paypal-button-container"></div>
-			</div>
-			
-		</div>
+                    <button id="submit-button" class="btn btn-success btn-block">
+                        <span id="button-text">Pay now</span>
+                    </button>
+                </form>
+            </div>
+        </div>
 
-		<div class="col-lg-6">
-			<div class="box-element">
-				<a  class="btn btn-outline-dark" href="{% url 'cart' %}">&#x2190; Back to Cart</a>
-				<hr>
-				<h3>Order Summary</h3>
-				<hr>
-				{% for item in items %}
-				<div class="cart-row">
-					<div style="flex:2"><img class="row-image" src="{{item.product.imageURL}}"></div>
-					<div style="flex:2"><p>{{item.product.name}}</p></div>
-					<div style="flex:1"><p>${{item.product.price|floatformat:2}}</p></div>
-					<div style="flex:1"><p>x{{item.quantity}}</p></div>
-				</div>
-				{% endfor %}
-				<h5>Items:   {{order.get_cart_items}}</h5>
-				<h5>Total:   ${{order.get_cart_total|floatformat:2}}</h5>
-			</div>
-		</div>
-	</div>
+        <div class="col-lg-6">
+            <div class="box-element">
+                <a class="btn btn-outline-dark" href="{% url 'cart' %}">&#x2190; Back to Cart</a>
+                <hr>
+                <h3>Order Summary</h3>
+                <hr>
+                {% for item in items %}
+                <div class="cart-row">
+                    <div style="flex:2"><img class="row-image" src="{{item.product.imageURL}}"></div>
+                    <div style="flex:2"><p>{{item.product.name}}</p></div>
+                    <div style="flex:1"><p>${{item.product.price|floatformat:2}}</p></div>
+                    <div style="flex:1"><p>x{{item.quantity}}</p></div>
+                </div>
+                {% endfor %}
+                <h5>Items: {{order.get_cart_items}}</h5>
+                <h5>Total: ${{order.get_cart_total|floatformat:2}}</h5>
+            </div>
+        </div>
+    </div>
+</div>
 
-	<script src="https://www.paypal.com/sdk/js?client-id=YOUR-CLIENT-ID&currency=USD&disable-funding=credit"></script>
-
-	<script>
-		var total = '{{order.get_cart_total}}'
-        // Render the PayPal button into #paypal-button-container
-        paypal.Buttons({
-
-        	style: {
-                color:  'blue',
-                shape:  'rect',
-            },
-
-            // Set up the transaction
-            createOrder: function(data, actions) {
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: {
-                            value:parseFloat(total).toFixed(2)
-                        }
-                    }]
-                });
-            },
-
-            // Finalize the transaction
-            onApprove: function(data, actions) {
-                return actions.order.capture().then(function(details) {
-                    // Show a success message to the buyer
-                    submitFormData()
-                });
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    var stripe = Stripe('{{ stripe_public_key }}');
+    var elements = stripe.elements();
+    var style = {
+        base: {
+            color: "#32325d",
+            fontFamily: 'Arial, sans-serif',
+            fontSmoothing: "antialiased",
+            fontSize: "16px",
+            "::placeholder": {
+                color: "#32325d"
             }
+        },
+        invalid: {
+            fontFamily: 'Arial, sans-serif',
+            color: "#fa755a",
+            iconColor: "#fa755a"
+        }
+    };
 
-        }).render('#paypal-button-container');
-    </script>
+    var card = elements.create("card", { style: style });
+    card.mount("#card-element");
 
-	<script type="text/javascript">
-		var shipping = '{{order.shipping}}'
+    card.on('change', function(event) {
+        var displayError = document.getElementById('card-errors');
+        if (event.error) {
+            displayError.textContent = event.error.message;
+        } else {
+            displayError.textContent = '';
+        }
+    });
 
-		if (shipping == 'False'){
-		 	document.getElementById('shipping-info').innerHTML = ''
-		}
+    var form = document.getElementById('payment-form');
+    form.addEventListener('submit', function(ev) {
+        ev.preventDefault();
+        
+        // Disable the submit button to prevent repeated clicks
+        document.getElementById('submit-button').disabled = true;
 
-		if (user != 'AnonymousUser'){
-		 	document.getElementById('user-info').innerHTML = ''
-		 }
-
-		if (shipping == 'False' && user != 'AnonymousUser'){
-			//Hide entire form if user is logged in and shipping is false
-				document.getElementById('form-wrapper').classList.add("hidden");
-				//Show payment if logged in user wants to buy an item that does not require shipping
-			    document.getElementById('payment-info').classList.remove("hidden");
-		}
-
-		var form = document.getElementById('form')
-		form.addEventListener('submit', function(e){
-	    	e.preventDefault()
-	    	console.log('Form Submitted...')
-	    	document.getElementById('form-button').classList.add("hidden");
-	    	document.getElementById('payment-info').classList.remove("hidden");
-	    })
-
-		/*
-	    document.getElementById('make-payment').addEventListener('click', function(e){
-	    	submitFormData()
-	    })
-	    */
-
-	    function submitFormData(){
-	    	console.log('Payment button clicked')
-
-	    	var userFormData = {
-				'name':null,
-				'email':null,
-				'total':total,
-			}
-
-			var shippingInfo = {
-				'address':null,
-				'city':null,
-				'state':null,
-				'zipcode':null,
-			}
-
-			if (shipping != 'False'){
-	    		shippingInfo.address = form.address.value
-		    	shippingInfo.city = form.city.value
-		    	shippingInfo.state = form.state.value
-		    	shippingInfo.zipcode = form.zipcode.value
-	    	}
-
-	    	if (user == 'AnonymousUser'){
-	    		userFormData.name = form.name.value
-	    		userFormData.email = form.email.value
-	    	}
-
-	    	console.log('Shipping Info:', shippingInfo)
-	    	console.log('User Info:', userFormData)
-
-	    	var url = "/process_order/"
-	    	fetch(url, {
-	    		method:'POST',
-	    		headers:{
-	    			'Content-Type':'applicaiton/json',
-	    			'X-CSRFToken':csrftoken,
-	    		}, 
-	    		body:JSON.stringify({'form':userFormData, 'shipping':shippingInfo}),
-	    		
-	    	})
-	    	.then((response) => response.json())
-	    	.then((data) => {
-				console.log('Success:', data);
-				alert('Transaction completed');  
-
-				cart = {}
-				document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
-
-				window.location.href = "{% url 'store' %}"
-
-				})
-	    }
-	</script>
+        fetch('/create-payment-intent/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                order_id: '{{ order.id }}'
+            })
+        })
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(data) {
+            return stripe.confirmCardPayment(data.clientSecret, {
+                payment_method: {
+                    card: card,
+                    billing_details: {
+                        name: '{{ request.user.username }}'
+                    }
+                }
+            });
+        })
+        .then(function(result) {
+            if (result.error) {
+                var errorElement = document.getElementById('card-errors');
+                errorElement.textContent = result.error.message;
+                document.getElementById('submit-button').disabled = false;
+            } else {
+                // Payment successful
+                submitFormData();
+            }
+        });
+    });
+</script>
 {% endblock content %}
 
 
