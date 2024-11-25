@@ -443,3 +443,245 @@ h1,h2,h3,h4,h5,h6{
     line-height: 1.5;
     border-radius: 0.2rem;
 }
+
+/* Payment Form Styles */
+.payment-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.payment-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.payment-header h2 {
+    color: #2d3436;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.secure-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 15px;
+    background: #f8f9fa;
+    border-radius: 20px;
+    color: #2d3436;
+    font-size: 14px;
+}
+
+.secure-badge i {
+    color: #00b894;
+    margin-right: 8px;
+}
+
+/* Order Summary Styles */
+.order-summary {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.order-summary h3 {
+    color: #2d3436;
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.summary-details {
+    font-size: 15px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.summary-row.total {
+    border-top: 2px solid #dfe6e9;
+    border-bottom: none;
+    margin-top: 10px;
+    padding-top: 15px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* Payment Details Styles */
+.payment-details {
+    padding: 20px;
+}
+
+.payment-details h3 {
+    color: #2d3436;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.card-icons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.card-icons img {
+    height: 30px;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.card-icons img:hover {
+    opacity: 1;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #2d3436;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #dfe6e9;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #74b9ff;
+    box-shadow: 0 0 0 3px rgba(116, 185, 255, 0.1);
+    outline: none;
+}
+
+#card-element {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #dfe6e9;
+}
+
+#card-errors {
+    color: #d63031;
+    font-size: 14px;
+    margin-top: 8px;
+    min-height: 20px;
+}
+
+.payment-button {
+    width: 100%;
+    padding: 15px;
+    background: #00b894;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.payment-button:hover {
+    background: #00a28d;
+}
+
+.payment-button:disabled {
+    background: #b2bec3;
+    cursor: not-allowed;
+}
+
+.spinner {
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top: 3px solid white;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.hidden {
+    display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .payment-container {
+        margin: 20px;
+        padding: 20px;
+    }
+    
+    .summary-row {
+        font-size: 14px;
+    }
+    
+    .summary-row.total {
+        font-size: 16px;
+    }
+}
+
+/* Success Page Styles */
+.success-container {
+    text-align: center;
+    padding: 40px 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.success-icon {
+    color: #28a745;
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+
+.order-details {
+    margin: 20px 0;
+    padding: 20px;
+    background: white;
+    border-radius: 4px;
+}
+
+.alert {
+    border-radius: 0;
+    margin-bottom: 0;
+    position: relative;
+    z-index: 1000;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-dismissible .close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.75rem 1.25rem;
+    color: inherit;
+}

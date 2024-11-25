@@ -10,6 +10,8 @@
 
 	<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
 
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
 	<script type="text/javascript">
 		var user = '{{request.user}}'
 
@@ -77,16 +79,43 @@
 	 
 	    </ul>
 	    <div class="form-inline my-2 my-lg-0">
-	     	<a href="#"class="btn btn-warning">Login</a>
-	     	
-	     	<a href="{% url 'cart' %}">
-	    		<img  id="cart-icon" src="{% static 'images/cart.png' %}">
-	    	</a>
-	    	<p id="cart-total">{{cartItems}}</p>
-
+	     	<div class="navbar-nav">
+	            {% if user.is_authenticated %}
+	                <a class="nav-item nav-link" href="{% url 'profile' %}">My Profile</a>
+	                <a class="nav-item nav-link" href="{% url 'logout' %}">Logout</a>
+	            {% else %}
+	                <a class="nav-item nav-link" href="{% url 'login' %}">Login</a>
+	            {% endif %}
+	            <a class="nav-item nav-link" href="{% url 'cart' %}">
+	                <img id="cart-icon" src="{% static 'images/cart.png' %}">
+	                <p id="cart-total">{{cartItems}}</p>
+	            </a>
+	        </div>
 	    </div>
 	  </div>
 	</nav>
+
+	{% if messages %}
+	<div class="container mt-3">
+	    {% for message in messages %}
+	    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+	        {{ message }}
+	        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+	            <span aria-hidden="true">&times;</span>
+	        </button>
+	    </div>
+	    {% endfor %}
+	</div>
+	{% endif %}
+
+	<script>
+	    // Auto dismiss alerts after 3 seconds
+	    document.addEventListener('DOMContentLoaded', function() {
+	        setTimeout(function() {
+	            $('.alert').alert('close');
+	        }, 3000);
+	    });
+	</script>
 
      <div class="container">
             <br>

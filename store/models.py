@@ -76,11 +76,7 @@ class Product(models.Model):
 		auto_now=True,
 		null=True
 	)
-	stock = models.IntegerField(
-		default=0,
-		null=True,
-		blank=True
-	)
+	stock = models.IntegerField(default=100)
 	sku = models.CharField(
 		max_length=100,
 		null=True,
@@ -98,6 +94,13 @@ class Product(models.Model):
 		except:
 			url = ''
 		return url
+
+	def decrease_stock(self, quantity):
+		if self.stock >= quantity:
+			self.stock -= quantity
+			self.save()
+			return True
+		return False
 
 class Order(models.Model):
 	customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)

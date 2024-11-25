@@ -1,0 +1,50 @@
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 200 36213
+"GET / HTTP/1.1" 200 36213
+"GET /static/css/main.css HTTP/1.1" 304 0
+"GET /static/css/main.css HTTP/1.1" 304 0
+"GET /static/images/cart.png HTTP/1.1" 304 0
+"GET /static/images/cart.png HTTP/1.1" 304 0
+"GET /images/headphones.jpg HTTP/1.1" 304 0
+"GET /images/headphones.jpg HTTP/1.1" 304 0
+"GET /images/book.jpg HTTP/1.1" 304 0
+"GET /images/book.jpg HTTP/1.1" 304 0
+"GET /images/sourcecode.jpg HTTP/1.1" 304 0
+"GET /images/sourcecode.jpg HTTP/1.1" 304 0
+"GET /images/watch.jpg HTTP/1.1" 304 0
+"GET /images/watch.jpg HTTP/1.1" 304 0
+"GET /static/js/cart.js HTTP/1.1" 304 0
+"GET /static/js/cart.js HTTP/1.1" 304 0
+"GET /images/shoes.jpg HTTP/1.1" 304 0
+"GET /images/shoes.jpg HTTP/1.1" 304 0
+"GET /images/shirt.jpg HTTP/1.1" 304 0
+"GET /images/shirt.jpg HTTP/1.1" 304 0
+"POST /update_item/ HTTP/1.1" 200 16
+"POST /update_item/ HTTP/1.1" 200 16
+"GET / HTTP/1.1" 200 36213
+"GET / HTTP/1.1" 200 36213
+"GET /cart/ HTTP/1.1" 200 5238
+"GET /cart/ HTTP/1.1" 200 5238
+"GET /static/images/arrow-down.png HTTP/1.1" 304 0
+"GET /static/images/arrow-up.png HTTP/1.1" 304 0
+"GET /static/images/arrow-down.png HTTP/1.1" 304 0
+"GET /static/images/arrow-up.png HTTP/1.1" 304 0
+"GET /checkout/ HTTP/1.1" 200 15336
+"GET /checkout/ HTTP/1.1" 200 15336
+"GET /static/images/mastercard.svg HTTP/1.1" 404 1877
+"GET /static/images/visa.svg HTTP/1.1" 404 1859
+"GET /static/images/mastercard.svg HTTP/1.1" 404 1877
+"GET /static/images/visa.svg HTTP/1.1" 404 1859
+"GET /static/images/amex.svg HTTP/1.1" 404 1859
+"GET /static/images/amex.svg HTTP/1.1" 404 1859
+message='Request to Stripe api' method=post url=https://api.stripe.com/v1/payment_intents
+message='Stripe API response' path=https://api.stripe.com/v1/payment_intents response_code=200
+"POST /create-payment-intent/ HTTP/1.1" 200 124
+"POST /create-payment-intent/ HTTP/1.1" 200 124
+"POST /process_order/ HTTP/1.1" 200 21
+"POST /process_order/ HTTP/1.1" 200 21
+"GET /payment-failed/?error=Order%20processing%20failed HTTP/1.1" 200 4238
+"GET /payment-failed/?error=Order%20processing%20failed HTTP/1.1" 200 4238
+/home/narasima/Projects/Frands/Brad/bradyShop/ecommerce/settings.py changed, reloading.
+/home/narasima/Projects/Frands/Brad/bradyShop/ecommerce/settings.py changed, reloading.

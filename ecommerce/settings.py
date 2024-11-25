@@ -130,5 +130,35 @@ MEDIA_URL = '/images/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')
 
 # Stripe Settings
-STRIPE_PUBLIC_KEY = 'pk_test_51Nd8aQSFUCQ0kY1rg4AJNMkmuDZh4IalbK7uufeaaDDRP1gFfIW2AQGosT8xX1jQO6H6nXgdL6XK5726hAUIUvLb00FUWEmdtC'
-STRIPE_SECRET_KEY = 'sk_test_51Nd8aQSFUCQ0kY1rq2oLjdRgw0kSrj6gchRekAbLGrbzTyHsxQ12KCze9RPVK3BmQEzfscJKHSQCnR4DOS0J3tpX00P5tG03L5'
+STRIPE_PUBLIC_KEY = 'pk_test_51QOkUhFN4SOk3REdhNucRRKBWosaPp9vBmKF0CfHG6tKDNTZ9GFyH2tlRw1EIALwMrfclXLHIGolh4QgdBQQHWoK00pc0ARz0l'
+STRIPE_SECRET_KEY = 'sk_test_51QOkUhFN4SOk3REdbMZnTKRdPpimYvPmUGOJEAdpUp3pJllmswgIbpDEqZurCOruDFSBk8PJGtz76iO0PyF5y7jH00Axh9p7GV'
+
+# Add this at the end of the file
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'order_processing.log',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'store.views': {  # This will capture logs from your views.py
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}

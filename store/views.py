@@ -9,6 +9,15 @@ from django.contrib.auth import login, authenticate
 from .forms import CustomUserCreationForm, CustomerForm
 import stripe
 from django.conf import settings
+from django.urls import reverse
+import logging
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 # Add these settings at the top of the file
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -109,23 +118,26 @@ def cart(request):
 	return render(request, 'store/cart.html', context)
 
 def checkout(request):
-	data = cartData(request)
-	
-	cartItems = data['cartItems']
-	order = data['order']
-	items = data['items']
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+    items = data['items']
 
-	# If user is not authenticated, redirect to login/register choice page
-	if not request.user.is_authenticated:
-		return redirect('login_register_choice')
+    # Check if cart total is 0
+    if order.get_cart_total == 0:
+        return redirect('cart')  # Redirect to cart if total is 0
 
-	context = {
-		'items': items,
-		'order': order,
-		'cartItems': cartItems,
-		'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
-	}
-	return render(request, 'store/checkout.html', context)
+    # If user is not authenticated, redirect to login/register choice page
+    if not request.user.is_authenticated:
+        return redirect('login_register_choice')
+
+    context = {
+        'items': items,
+        'order': order,
+        'cartItems': cartItems,
+        'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
+    }
+    return render(request, 'store/checkout.html', context)
 
 def updateItem(request):
 	data = json.loads(request.body)
@@ -227,48 +239,107 @@ def login_view(request):
 	return render(request, 'store/login.html')
 
 def create_payment_intent(request):
-	data = cartData(request)
-	order = data['order']
-	
-	intent = stripe.PaymentIntent.create(
-		amount=int(order.get_cart_total * 100),  # Convert to cents
-		currency='usd',
-		metadata={'order_id': order.id}
-	)
-	
-	return JsonResponse({
-		'clientSecret': intent.client_secret
-	})
+	try:
+		data = json.loads(request.body)
+		
+		# Create PaymentIntent with correct configuration
+		intent = stripe.PaymentIntent.create(
+			amount=int(float(data['amount']) * 100),  # Convert to cents
+			currency='usd',
+			payment_method=data['payment_method_id'],
+			automatic_payment_methods={
+				'enabled': True,
+				'allow_redirects': 'never'
+			},
+			confirm=True,
+			return_url=request.build_absolute_uri(reverse('payment_success'))
+		)
+		
+		if intent.status == 'requires_action':
+			return JsonResponse({
+				'success': True,
+				'requires_action': True,
+				'client_secret': intent.client_secret
+			})
+		
+		return JsonResponse({
+			'success': True,
+			'requires_action': False,
+			'client_secret': intent.client_secret
+		})
+		
+	except stripe.error.CardError as e:
+		return JsonResponse({
+			'success': False,
+			'error': e.error.message
+		})
+	except Exception as e:
+		return JsonResponse({
+			'success': False,
+			'error': str(e)
+		})
 
 def process_order(request):
-	transaction_id = datetime.datetime.now().timestamp()
-	data = json.loads(request.body)
+    try:
+        data = json.loads(request.body)
+        logger.debug(f"Received data: {data}")
 
-	if request.user.is_authenticated:
-		customer = request.user.customer
-		order, created = Order.objects.get_or_create(customer=customer, complete=False)
-	else:
-		# Handle guest user case
-		customer, order = guestOrder(request, data)
+        # Get the order
+        if request.user.is_authenticated:
+            customer = request.user.customer
+            order, created = Order.objects.get_or_create(customer=customer, complete=False)
+        else:
+            cookieData = cartData(request)
+            order = cookieData['order']
+            customer = None
 
-	total = float(data['form']['total'])
-	order.transaction_id = transaction_id
+        # Decrease stock for each item
+        order_items = order.orderitem_set.all()
+        for item in order_items:
+            product = item.product
+            if product.stock >= item.quantity:
+                product.stock -= item.quantity
+                product.save()
+            else:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': f'Insufficient stock for {product.name}'
+                })
 
-	if total == order.get_cart_total:
-		order.complete = True
-	order.save()
+        # Process the order
+        order.complete = True
+        order.transaction_id = datetime.datetime.now().timestamp()
+        order.save()
 
-	if order.shipping:
-		ShippingAddress.objects.create(
-			customer=customer,
-			order=order,
-			address=data['shipping']['address'],
-			city=data['shipping']['city'],
-			state=data['shipping']['state'],
-			zipcode=data['shipping']['zipcode'],
-		)
+        # Create shipping address - Make sure this runs
+        if data.get('shipping'):  # Changed from 'in data' to get()
+            shipping_data = data['shipping']
+            shipping = ShippingAddress.objects.create(
+                customer=customer,
+                order=order,
+                address=shipping_data.get('address', ''),
+                city=shipping_data.get('city', ''),
+                state=shipping_data.get('state', ''),
+                zipcode=shipping_data.get('zipcode', '')
+            )
+            logger.debug(f"Created shipping address: {shipping}")
 
-	return JsonResponse('Payment complete!', safe=False)
+        # Save order ID in session for guest users
+        if not request.user.is_authenticated:
+            request.session['last_order_id'] = order.id
+
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Order processed successfully',
+            'order_id': order.id
+        })
+
+    except Exception as e:
+        logger.error(f"Order processing error: {str(e)}")
+        return JsonResponse({
+            'status': 'error',
+            'message': f'Order processing failed: {str(e)}'
+        })
 
 def login_register_choice(request):
 	"""View to let users choose between login, register, or guest checkout"""
@@ -277,3 +348,44 @@ def login_register_choice(request):
 		return redirect('checkout')
 		
 	return render(request, 'store/login_register_choice.html')
+
+def payment_success(request):
+    # Get the most recent completed order for the user
+    if request.user.is_authenticated:
+        order = Order.objects.filter(
+            customer=request.user.customer, 
+            complete=True
+        ).order_by('-date_ordered').first()
+    else:
+        # For guest users, get order from session
+        order_id = request.session.get('last_order_id')
+        order = Order.objects.filter(id=order_id).first() if order_id else None
+
+    context = {
+        'order': order,
+        'items': order.orderitem_set.all() if order else None,
+        'total': order.get_cart_total if order else 0,
+    }
+    return render(request, 'store/payment_success.html', context)
+
+def payment_failed(request):
+	error_message = request.GET.get('error', 'An error occurred during payment processing.')
+	return render(request, 'store/payment_failed.html', {'error_message': error_message})
+
+@login_required
+def profile(request):
+    customer = request.user.customer
+    orders = Order.objects.filter(customer=customer, complete=True).order_by('-date_ordered')
+    
+    context = {
+        'customer': customer,
+        'orders': orders,
+    }
+    return render(request, 'store/profile.html', context)
+
+
+def logout_view(request):
+    if request.user.is_authenticated:
+        logout(request)
+        messages.success(request, 'You have been successfully logged out.')
+    return redirect('store')

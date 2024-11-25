@@ -1,0 +1,100 @@
+{% extends 'store/main.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="success-container text-center">
+        <i class="fas fa-check-circle" style="color: #28a745; font-size: 64px;"></i>
+        <h2 class="mt-3 text-success">Payment Successful!</h2>
+        <p>Thank you for your purchase.</p>
+        
+        {% if order %}
+        <div class="order-details mt-4">
+            <h4>Order Summary</h4>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td>{{ item.product.name }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>${{ item.product.price|floatformat:2 }}</td>
+                            <td>${{ item.get_total|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="table-active">
+                            <td colspan="3" class="text-right"><strong>Total:</strong></td>
+                            <td><strong>${{ total|floatformat:2 }}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            {% if order.shipping %}
+            <div class="shipping-details mt-4">
+                <h4>Shipping Details</h4>
+                <div class="address-box">
+                    <p class="mb-1"><strong>Address:</strong> {{ order.shippingaddress.address }}</p>
+                    <p class="mb-1"><strong>City:</strong> {{ order.shippingaddress.city }}</p>
+                    <p class="mb-1"><strong>State:</strong> {{ order.shippingaddress.state }}</p>
+                    <p class="mb-1"><strong>ZIP Code:</strong> {{ order.shippingaddress.zipcode }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        <div class="mt-4">
+            <a href="{% url 'store' %}" class="btn btn-primary">Continue Shopping</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .success-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .table {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .shipping-details {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+    }
+    
+    .order-details {
+        margin-top: 30px;
+        padding: 20px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        background-color: white;
+    }
+    
+    .address-box {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 10px;
+    }
+    
+    .address-box p {
+        font-size: 16px;
+        color: #333;
+    }
+</style>
+{% endblock content %} 

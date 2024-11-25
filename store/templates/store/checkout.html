@@ -6,56 +6,105 @@
     <div class="row">
         <div class="col-lg-6">
             <div class="box-element" id="form-wrapper">
-                <form id="payment-form">
-                    <div id="shipping-info">
-                        <hr>
-                        <h3>Shipping Information:</h3>
-                        <hr>
-                        <div class="form-field">
-                            <input class="form-control" type="text" name="address" placeholder="Address..">
-                        </div>
-                        <div class="form-field">
-                            <input class="form-control" type="text" name="city" placeholder="City..">
-                        </div>
-                        <div class="form-field">
-                            <input class="form-control" type="text" name="state" placeholder="State..">
-                        </div>
-                        <div class="form-field">
-                            <input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
+                <div class="payment-container">
+                    <div class="payment-header">
+                        <h2>Secure Payment</h2>
+                        <div class="secure-badge">
+                            <i class="fas fa-lock"></i> SSL Secure Payment
                         </div>
                     </div>
 
-                    <hr>
-                    <h3>Payment:</h3>
-                    <hr>
-                    <div id="card-element">
-                        <!-- A Stripe Element will be inserted here. -->
-                    </div>
-                    <div id="card-errors" role="alert"></div>
+                    <form id="payment-form">
+                        <!-- Order Summary -->
+                        <div class="order-summary">
+                            <h3>Order Summary</h3>
+                            <div class="summary-details">
+                                <div class="summary-row">
+                                    <span>Subtotal</span>
+                                    <span>${{order.get_cart_total|floatformat:2}}</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Shipping</span>
+                                    <span>Free</span>
+                                </div>
+                                <div class="summary-row total">
+                                    <span>Total</span>
+                                    <span>${{order.get_cart_total|floatformat:2}}</span>
+                                </div>
+                            </div>
+                        </div>
 
-                    <button id="submit-button" class="btn btn-success btn-block">
-                        <span id="button-text">Pay now</span>
-                    </button>
-                </form>
-            </div>
-        </div>
+                        <!-- Payment Details -->
+                        <div class="payment-details">
+                            <h3>Payment Details</h3>
+                            
+                            <div class="card-icons">
+                                <img src="{% static 'images/visa.svg' %}" alt="Visa">
+                                <img src="{% static 'images/mastercard.svg' %}" alt="Mastercard">
+                                <img src="{% static 'images/amex.svg' %}" alt="American Express">
+                            </div>
 
-        <div class="col-lg-6">
-            <div class="box-element">
-                <a class="btn btn-outline-dark" href="{% url 'cart' %}">&#x2190; Back to Cart</a>
-                <hr>
-                <h3>Order Summary</h3>
-                <hr>
-                {% for item in items %}
-                <div class="cart-row">
-                    <div style="flex:2"><img class="row-image" src="{{item.product.imageURL}}"></div>
-                    <div style="flex:2"><p>{{item.product.name}}</p></div>
-                    <div style="flex:1"><p>${{item.product.price|floatformat:2}}</p></div>
-                    <div style="flex:1"><p>x{{item.quantity}}</p></div>
+                            <div class="form-group">
+                                <label for="card-holder">Card Holder Name</label>
+                                <input type="text" id="card-holder" class="form-control" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="card-element">Card Information</label>
+                                <div id="card-element" class="form-control"></div>
+                                <div id="card-errors" role="alert"></div>
+                            </div>
+
+                            <div class="shipping-info">
+                                <h3>Shipping Information</h3>
+                                
+                                <div class="form-group">
+                                    <label for="address">Address</label>
+                                    <input type="text" class="form-control" id="address" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="city">City</label>
+                                    <input type="text" class="form-control" id="city" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="state">State</label>
+                                    <input type="text" class="form-control" id="state" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="zipcode">Zipcode</label>
+                                    <input type="text" class="form-control" id="zipcode" required>
+                                </div>
+                            </div>
+
+                            <button id="submit-button" class="payment-button" type="submit">
+                                <div id="spinner" class="spinner hidden"></div>
+                                <span id="button-text">Pay ${{order.get_cart_total|floatformat:2}}</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                {% endfor %}
-                <h5>Items: {{order.get_cart_items}}</h5>
-                <h5>Total: ${{order.get_cart_total|floatformat:2}}</h5>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="box-element">
+                    <a class="btn btn-outline-dark" href="{% url 'cart' %}">&#x2190; Back to Cart</a>
+                    <hr>
+                    <h3>Order Summary</h3>
+                    <hr>
+                    {% for item in items %}
+                    <div class="cart-row">
+                        <div style="flex:2"><img class="row-image" src="{{item.product.imageURL}}"></div>
+                        <div style="flex:2"><p>{{item.product.name}}</p></div>
+                        <div style="flex:1"><p>${{item.product.price|floatformat:2}}</p></div>
+                        <div style="flex:1"><p>x{{item.quantity}}</p></div>
+                    </div>
+                    {% endfor %}
+                    <h5>Items: {{order.get_cart_items}}</h5>
+                    <h5>Total: ${{order.get_cart_total|floatformat:2}}</h5>
+                </div>
             </div>
         </div>
     </div>
@@ -65,75 +114,110 @@
 <script>
     var stripe = Stripe('{{ stripe_public_key }}');
     var elements = stripe.elements();
+
     var style = {
         base: {
-            color: "#32325d",
-            fontFamily: 'Arial, sans-serif',
-            fontSmoothing: "antialiased",
-            fontSize: "16px",
-            "::placeholder": {
-                color: "#32325d"
+            color: '#32325d',
+            fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+            fontSmoothing: 'antialiased',
+            fontSize: '16px',
+            '::placeholder': {
+                color: '#aab7c4'
             }
         },
         invalid: {
-            fontFamily: 'Arial, sans-serif',
-            color: "#fa755a",
-            iconColor: "#fa755a"
+            color: '#fa755a',
+            iconColor: '#fa755a'
         }
     };
 
-    var card = elements.create("card", { style: style });
-    card.mount("#card-element");
+    var card = elements.create('card', {style: style});
+    card.mount('#card-element');
 
-    card.on('change', function(event) {
+    // Handle real-time validation errors
+    card.addEventListener('change', function(event) {
         var displayError = document.getElementById('card-errors');
         if (event.error) {
             displayError.textContent = event.error.message;
+            displayError.classList.add('alert', 'alert-danger');
         } else {
             displayError.textContent = '';
+            displayError.classList.remove('alert', 'alert-danger');
         }
     });
 
+    // Handle form submission
     var form = document.getElementById('payment-form');
-    form.addEventListener('submit', function(ev) {
-        ev.preventDefault();
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
         
-        // Disable the submit button to prevent repeated clicks
-        document.getElementById('submit-button').disabled = true;
-
-        fetch('/create-payment-intent/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({
-                order_id: '{{ order.id }}'
-            })
-        })
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(data) {
-            return stripe.confirmCardPayment(data.clientSecret, {
-                payment_method: {
-                    card: card,
-                    billing_details: {
-                        name: '{{ request.user.username }}'
+        // Collect shipping information from form fields
+        const shippingInfo = {
+            address: document.getElementById('address').value,
+            city: document.getElementById('city').value,
+            state: document.getElementById('state').value,
+            zipcode: document.getElementById('zipcode').value,
+        };
+        
+        // Debug log
+        console.log('Shipping Info:', shippingInfo);
+        
+        try {
+            // Process the order
+            const orderResponse = await fetch('/process_order/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    'shipping': shippingInfo,
+                    'form': {
+                        'total': '{{order.get_cart_total}}'
                     }
-                }
+                })
             });
-        })
-        .then(function(result) {
-            if (result.error) {
-                var errorElement = document.getElementById('card-errors');
-                errorElement.textContent = result.error.message;
-                document.getElementById('submit-button').disabled = false;
+
+            // Debug log
+            console.log('Order Response:', await orderResponse.clone().text());
+
+            // If order processing succeeds, go to success page
+            if (orderResponse.ok) {
+                window.location.href = '/payment_success/';
             } else {
-                // Payment successful
-                submitFormData();
+                throw new Error('Order processing failed');
             }
-        });
+            
+        } catch (error) {
+            console.error('Error:', error);
+            window.location.href = `/payment-failed/?error=${encodeURIComponent(error.message)}`;
+        }
+    });
+
+    function handleError(error) {
+        console.error('Handling error:', error);  // Debug log
+        const errorElement = document.getElementById('card-errors');
+        errorElement.textContent = error.message;
+        errorElement.classList.add('alert', 'alert-danger');
+        
+        const submitButton = document.getElementById('submit-button');
+        const spinner = document.getElementById('spinner');
+        const buttonText = document.getElementById('button-text');
+        
+        if (submitButton) submitButton.disabled = false;
+        if (spinner) spinner.classList.add('hidden');
+        if (buttonText) buttonText.textContent = 'Try Again';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if order total is 0
+        const orderTotal = parseFloat('{{order.get_cart_total}}');
+        if (orderTotal === 0) {
+            window.location.href = '{% url "cart" %}';
+            return;
+        }
+
+        // Rest of your checkout JavaScript code...
     });
 </script>
 {% endblock content %}

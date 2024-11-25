@@ -1,0 +1,88 @@
+{% extends 'store/main.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Profile Information</h4>
+                    <p><strong>Name:</strong> {{ customer.name }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <h3>Order History</h3>
+            {% if orders %}
+                {% for order in orders %}
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between">
+                            <span>Order #{{ order.transaction_id|truncatechars:8 }}</span>
+                            <span>{{ order.date_ordered|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.orderitem_set.all %}
+                                <tr>
+                                    <td>{{ item.product.name }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>${{ item.get_total|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="2" class="text-right"><strong>Total:</strong></td>
+                                    <td><strong>${{ order.get_cart_total|floatformat:2 }}</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        
+                        {% if order.shippingaddress %}
+                        <div class="shipping-info mt-3">
+                            <small>
+                                <strong>Shipped to:</strong>
+                                {{ order.shippingaddress.address }},
+                                {{ order.shippingaddress.city }},
+                                {{ order.shippingaddress.state }}
+                                {{ order.shippingaddress.zipcode }}
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info">No orders yet.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .card-header {
+        background-color: #f8f9fa;
+    }
+    .shipping-info {
+        color: #6c757d;
+        border-top: 1px solid #dee2e6;
+        padding-top: 10px;
+    }
+</style>
+{% endblock content %} 
